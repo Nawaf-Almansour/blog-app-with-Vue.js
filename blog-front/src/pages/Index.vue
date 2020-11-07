@@ -1,86 +1,114 @@
 <template>
-  <Layout>
-    <v-container>
-      <v-row>
-        <v-col sm="6" offset-sm="3">
-          <v-tabs v-model="tab" grow>
-            <v-tab>Item One</v-tab>
-            <v-tab>Item Two</v-tab>
-            <v-tab>Item Three</v-tab>
-          </v-tabs>
-          <v-card
-              class="mx-auto"
-              max-width="400"
+  <Layout v-slot="{searchText}">
+    <v-tabs v-model="tab" grow>
+      <v-tab>All post</v-tab>
+      <v-tab>Music</v-tab>
+      <v-tab>Three</v-tab>
+    </v-tabs>
+    <v-row class="justify-lg-space-around">
+
+      <v-card
+          v-for="edge in getPost(searchText)" :key="edge.node.id"
+          class="mx-auto mt-5"
+          width="300"
+      >
+        <v-img
+            class="white--text align-end"
+            height="200px"
+            :src="`http://localhost:1337${edge.node.imag}`"
+        >
+        </v-img>
+        <v-card-title>{{ edge.node.title }}</v-card-title>
+
+        <v-card-subtitle class="pb-0">
+          {{ formatDate(edge.node.date) }}
+        </v-card-subtitle>
+
+        <v-card-text class="text--primary">
+          <div>{{ edge.node.duration }}</div>
+
+          <div>Whitsunday Island, Whitsunday Islands</div>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-btn
+              @click="$router.push(`/post/${edge.node.id}`)"
+              color="orange"
+              text
           >
-            <v-img
-                class="white--text align-end"
-                height="200px"
-                src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-            >
-              <v-card-title>Top 10 Australian beaches</v-card-title>
-            </v-img>
-
-            <v-card-subtitle class="pb-0">
-              Number 10
-            </v-card-subtitle>
-
-            <v-card-text class="text--primary">
-              <div>Whitehaven Beach</div>
-
-              <div>Whitsunday Island, Whitsunday Islands</div>
-            </v-card-text>
-
-            <v-card-actions>
-              <v-btn
-                  color="orange"
-                  text
-              >
-                Share
-              </v-btn>
-
-              <v-btn
-                  color="orange"
-                  text
-              >
-                Explore
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
+            More Info
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-row>
   </Layout>
 </template>
 
+<page-query>
+query {
+posts: allPost {
+edges {
+node {
+id
+title
+date
+duration
+price
+description
+imag
+categories
+}
+}
+}
+}
+</page-query>
 <script>
+import moment from 'moment'
+
 export default {
   metaInfo: {
     title: 'Hello, world!'
   },
-  data(){
+  data() {
     return {
-      tab: 0
+      tab: 0,
+      posts: []
     }
+  },
+  mounted() {
+    this.posts = this.$page.posts.edges
   },
   watch: {
     tab(val) {
       if (this.tab === 0) {
         this.showAllEvents()
       } else {
-        this.showEventsByType()
+        this.showEventsByType(val)
       }
     }
   },
   methods: {
     showAllEvents() {
-      console.log(this.tab + 'a')
+      this.posts = this.$page.posts.edges
+    },
+    showEventsByType(val) {
+      console.log(val)
+      this.posts = this.$page.posts.edges.filter((edge) => {
+        return edge.node.categories === val
+      })
 
     },
-    showEventsByType() {
-      console.log(this.tab + 'b')
+    formatDate(date) {
+      return moment(date).format('MMMM Do YYYY, h:mm a')
+    },
+    getPost(searchText){
+      return this.posts.filter((edge) => {
+        return edge.node.title.toLowerCase().includes(searchText.toLowerCase())
+    })
 
-    }
   }
+
+}
 }
 </script>
 

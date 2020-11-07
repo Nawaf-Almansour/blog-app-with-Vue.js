@@ -4,19 +4,39 @@
 
 // Changes here require a server restart.
 // To restart press CTRL + C in terminal and run `gridsome develop`
+const axios = require('axios')
 
 module.exports = function (api) {
-  api.chainWebpack((config, { isServer }) => {
-    if (isServer) {
-      config.externals([
-        nodeExternals({
-          allowlist: [/^vuetify/]
-        })
-      ])
-    }
-  })
+    api.chainWebpack((config, {isServer}) => {
+        if (isServer) {
+            config.externals([
+                nodeExternals({
+                    allowlist: [/^vuetify/]
+                })
+            ])
+        }
+    },)
 
-  api.createPages(({ createPage }) => {
-    // Use the Pages API here: https://gridsome.org/docs/pages-api/
-  })
+    api.loadSource(async actions => {
+        const {data} = await axios.get('http://localhost:1337/posts')
+
+        const collection = actions.addCollection({
+           typeName: 'Post',
+            path: '/post/:id'
+        })
+        for (const post of data) {
+            collection.addNode({
+                id: post.id,
+                path: '/post/' + post.id,
+                title: post.title,
+                date: post.date,
+                duration: post.duration,
+                price: post.price,
+                imag: post.imag[0].url,
+                description: post.description,
+                categories: post.categories[0].id
+            })
+        }
+    })
+
 }

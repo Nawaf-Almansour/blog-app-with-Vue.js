@@ -18,6 +18,7 @@ run App `npm run develop`
 install package axios  ` npm i axios`
 install webpack `npm install webpack-node-externals --save-dev`
 install vuetify UI `npm install vuetify --save`
+install moment `npm i moment`
 
 
 

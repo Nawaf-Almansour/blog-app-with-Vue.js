@@ -6,14 +6,19 @@
                dense
                dark
     >
+      <v-toolbar-title>
+        <g-link to="/">blog</g-link>
+      </v-toolbar-title>
       <v-app-bar-nav-icon></v-app-bar-nav-icon>
-      <v-toolbar-title>blog</v-toolbar-title>
       <v-text-field
+          v-model="searchText"
+          @click:clear="searchText = ''"
           placeholder="Search"
           class="ml-8"
           style="max-width: 350px; "
           prepend-inner-icon="mdi-magnify"
           outlined
+          clearable
           rounded
           dense
           hide-details
@@ -24,16 +29,40 @@
       </v-btn>
     </v-app-bar>
     <v-main>
-      <slot/>
+      <v-container>
+        <v-row>
+          <v-col sm="6" offset-sm="3">
+            <slot :searchText="searchText"/>
+          </v-col>
+        </v-row>
+      </v-container>
     </v-main>
   </v-app>
 </template>
 
 <static-query>
 query {
-metadata {
-siteName,
-siteDescription
-}
+    metadata {
+        siteName,
+        siteDescription
+    }
 }
 </static-query>
+
+<script>
+export default {
+  data() {
+    return {
+      searchText: ''
+    }
+  }
+}
+</script>
+<style scoped>
+.v-toolbar__title a {
+  text-decoration: none;
+  color: black;
+  background: transparent;
+
+}
+</style>
